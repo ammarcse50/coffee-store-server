@@ -31,8 +31,9 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-    const database = client.db("insertDB");
-    const coffeeCollection = database.collection("coffees");
+   
+    const coffeeCollection = client.db("insertDB").collection("coffees");
+    const usersCollection = client.db("insertDB").collection("users");
 
     app.get("/coffee/:id", async (req, res) => {
       const id = req.params.id;
@@ -92,6 +93,51 @@ async function run() {
 
       res.send(result);
     });
+
+
+       // users related database
+       app.get("/users", async (req, res) => {
+        const cursor = usersCollection.find();
+        const result = await cursor.toArray();
+  
+        res.send(result);
+      });
+       app.get("/user/:id", async (req, res) => {
+        const id = req.params.id;
+
+        const query = { _id: new ObjectId(id) };
+  
+        const result = await usersCollection.deleteOne(query);
+  
+        res.send(result);
+      });
+       app.post("/users", async (req, res) => {
+        const user = req.body;
+        console.log(user);
+  
+        const result = await usersCollection.insertOne(user);
+        res.send(result);
+      });
+      app.delete("/user/:id", async (req, res) => {
+        const id = req.params.id;
+  
+        const query = { _id: new ObjectId(id) };
+  
+        const result = await usersCollection.deleteOne(query);
+  
+        res.send(result);
+      });
+  
+
+
+
+
+
+
+
+
+
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
